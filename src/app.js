@@ -1,11 +1,19 @@
-const express = require('express');
+const express = require("express");
 const app = express();
 
-app.use((req,res)=>{
-    res.send("Server is running ,hello there");
+//Orders of the routes matters a lot 
+
+// app.use("/", (req, res) => {
+//   res.send("slash");
+// });
+app.use("/hello", (req, res) => {
+  res.send("slash hello");
 });
 
-app.listen(3000,()=>{
-    console.log("Server is Running");
-    
+app.get('/users',(req,res)=>{
+    res.send({firstname:"Rahul",lastname:"Singh"});
+})
+
+app.listen(3000, () => {
+  console.log("Server is Running");
 });
