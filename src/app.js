@@ -6,9 +6,16 @@ const app = express();
 // app.use("/", (req, res) => {
 //   res.send("slash");
 // });
-app.use("/hello", (req, res) => {
+app.use("/hello", (req, res,next) => {
+  next();
   res.send("slash hello");
-});
+},
+(req,res)=>{
+  console.log("hello this is next");
+  res.send("this is next")
+}
+);
+
 
 app.get('/users',(req,res)=>{
     res.send({firstname:"Rahul",lastname:"Singh"});
