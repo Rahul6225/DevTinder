@@ -9,4 +9,17 @@ const adminAuth = (req,res,next)=>{
     }
 }
 
-module.exports = {adminAuth};
+const userAuth = (req,res,next)=>{
+    console.log("Admin auth is checked");
+    const token = "pdss";
+    const userValid = token === "pass";
+    if(!userValid){
+        console.log(res.status(401).send("User is not authorized"));
+        
+    }else{
+        next();
+    }
+    
+}
+
+module.exports = {adminAuth,userAuth};
