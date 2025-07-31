@@ -3,19 +3,13 @@ const app = express();
 require("./configs/db.js");
 const { ConnectDB } = require("./configs/db.js");
 const User = require("./models/user");
-
+app.use(express.json());
 
 //most of the Api getting data or posting data return a  promise then we have to put into async await
 app.post("/signup", async (req, res) => {
-  //Crete new instance of new user model
-  const user = new User({
-    firstName: "Ashish",
-    lastName: "Jadon",
-    emailId: "Ashishorstan@gmail.com",
-    password: "rahuhhjn",
-    age: 23,
-    gender: "male",
-  });
+  console.log(req.body);
+  // Crete new instance of new user model
+  const user = new User(req.body)
   try{
     await user.save();
     res.send("User added succefully")
