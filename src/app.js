@@ -5,6 +5,24 @@ const { ConnectDB } = require("./configs/db.js");
 const User = require("./models/user");
 app.use(express.json());
 
+//
+app.get('/user',async (req,res)=>{
+  const userEmail =  req.body.emailId;
+  try{
+    const users = await User.find({emailId:userEmail});
+    if(users.length===0){
+      res.status(404).send("User not found")
+    }else{
+      console.log("data fetched succefully");
+      
+      res.send(users)
+
+    }
+  }catch(err){
+    res.status(404).send("Something went wrong")
+  }
+})
+
 //most of the Api getting data or posting data return a  promise then we have to put into async await
 app.post("/signup", async (req, res) => {
   console.log(req.body);
@@ -17,6 +35,32 @@ app.post("/signup", async (req, res) => {
     res.status(400).send("Error saving the user:"+err.message);
   }
 });
+
+app.delete('/user', async (req,res)=>{
+  const userId = req.body.userId;
+  try{
+    const user = await User.findByIdAndDelete(userId);
+    res.send("User Deleted Succesfully");
+  }
+  catch(err){
+    res.status(400).send(err+"Something error")
+  }
+})
+
+app.patch('/user',async (req,res)=>{
+  const userId = req.body.userId;
+  const data = req.body;
+  try{
+    const user = await User.findByIdAndUpdate({_id:userId},data);
+    console.log(user);
+    res.send("user Updated succesfully");
+  }
+  catch(err){
+    res.status(400).send("something went wrong");
+  }
+});
+
+
 
 ConnectDB()
   .then(() => {
