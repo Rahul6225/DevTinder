@@ -5,24 +5,28 @@ const { ConnectDB } = require("./configs/db.js");
 const User = require("./models/user");
 const { validateSignUpdata } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { userAuth } = require("./Middlewares/auth.js");
 
-app.get("/user", async (req, res) => {
-  const userEmail = req.body.emailId;
+app.use(express.json());
+app.use(cookieParser());
+
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const users = await User.find({ emailId: userEmail });
-    if (users.length === 0) {
-      res.status(404).send("User not found");
-    } else {
-      console.log("data fetched succefully");
-
-      res.send(users);
-    }
+    const user = req.user;
+    res.send(user);
+    // console.log(cookies);
   } catch (err) {
-    res.status(404).send("Something went wrong");
+    res.status(400).send("Error saving the user:" + err.message);
   }
 });
-app.use(express.json());
-
+app.post("/sendconnectionreq", userAuth, async (req, res) => {
+  const user = req.user;
+  //sending the connection request
+  console.log("Sending the connection request");
+  res.send(user.firstName + " sent Connection request!");
+});
 //most of the Api getting data or posting data return a  promise then we have to put into async await
 app.post("/signup", async (req, res) => {
   // console.log(req.body);
@@ -49,48 +53,33 @@ app.post("/signup", async (req, res) => {
     res.status(400).send("Error saving the user:" + err.message);
   }
 });
-app.post('/login',async (req,res)=>{
-  try{
-    const {emailId,password} = req.body;
-    const user =await User.findOne({emailId:emailId});
-    if(!user){
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
       throw new Error("Invalid credentials ");
       // res.send("User not found,check your credentials");
     }
-    const isPassword =await bcrypt.compare(password,user.password);
+    const isPassword = await bcrypt.compare(password, user.password);
 
-    if(isPassword){
-      res.send("Login successful")
-    }
-    else{
+    if (isPassword) {
+      //create JWT
+      const token = await jwt.sign({ _id: user._id }, "redmi@6225", {
+        expiresIn: "7d",
+      });
+      console.log(token);
+
+      //Add the token to the cookie and send the response
+      res.cookie("token", token);
+      res.send("Login successful");
+    } else {
       console.log("invalid password");
-      
+
       throw new Error("Invalid password");
     }
-  }catch(error){
-    res.status(401).send("ERROR"+error)
-  }
-})
-
-app.delete("/user", async (req, res) => {
-  const userId = req.body.userId;
-  try {
-    const user = await User.findByIdAndDelete(userId);
-    res.send("User Deleted Succesfully");
-  } catch (err) {
-    res.status(400).send(err + "Something error");
-  }
-});
-
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
-  const data = req.body;
-  try {
-    const user = await User.findByIdAndUpdate({ _id: userId }, data);
-    console.log(user);
-    res.send("user Updated succesfully");
-  } catch (err) {
-    res.status(400).send("something went wrong");
+  } catch (error) {
+    res.status(401).send("ERROR" + error);
   }
 });
 
