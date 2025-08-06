@@ -61,4 +61,5 @@ userSchema.methods.validatePassword = async function(passwordEnterByUser){
    );
    return isPasswordValid;
 }
+
 module.exports = mongoose.model("User", userSchema);
