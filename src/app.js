@@ -10,17 +10,16 @@ app.use(cookieParser());
 const authRouter = require("./routes/auth.js");
 const profileRouter = require("./routes/profile.js");
 const requestRouter = require("./routes/request.js");
-
+const userRouter = require("./routes/userRouters.js");
 
 //most of the Api getting data or posting data return a  promise then we have to put into async await
 //Orders of the routes matters a lot
 
-app.use("/",authRouter);
-app.use("/",profileRouter);
+app.use("/", authRouter);
+app.use("/", profileRouter);
 app.use("/", requestRouter);
-
-
-
+app.use("/", userRouter);
+// app.use("/", connectionRouter);
 
 ConnectDB()
   .then(() => {
@@ -32,5 +31,3 @@ ConnectDB()
   .catch((err) => {
     console.log("Database failed to connect");
   });
-
-

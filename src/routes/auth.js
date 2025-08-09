@@ -11,11 +11,12 @@ authRouter.post("/signup", async (req, res) => {
   try {
     validateSignUpdata(req);
 
-    //Encrypting the password
+    //Encrypting the password+
+
     const { firstName, lastName, emailId, password } = req.body;
     const passHash = await bcrypt.hash(password, 10);
     // res.send(passHash);
-    console.log(passHash);
+    // console.log(passHash);
 
     // Crete new instance of new user model
     const user = new User({
@@ -44,11 +45,13 @@ authRouter.post("/login", async (req, res) => {
     if (isPassword) {
       //create JWT
       const token = await user.getJWT();
-      console.log(token);
+      // console.log(token);
 
       //Add the token to the cookie and send the response
       res.cookie("token", token);
       res.send("Login successful");
+    console.log("Logged In: " + user.firstName);
+
     } else {
       console.log("invalid password");
 
@@ -60,10 +63,13 @@ authRouter.post("/login", async (req, res) => {
 });
 
 authRouter.post("/logout",async (req, res) => {
+
     res.cookie("token",null,{
       expires:new Date(Date.now())
     });
-    res.send("You are logged Out");
+    res.send("Logged Out Successfully");
+    console.log("Logged Out");
+    
 });
 
 module.exports = authRouter;

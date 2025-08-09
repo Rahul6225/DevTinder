@@ -10,14 +10,18 @@ const userAuth = async (req, res, next) => {
     //validate the token
     const decodeObj = await jwt.verify(token, "redmi@6225");
     const { _id } = decodeObj;
+    // console.log(_id);
+    
 
     //find the user
     const user = await User.findById(_id);
+    
     if (!user) {
       throw new Error("User not Found");
     }
     req.user = user;
     next();
+
   } catch (err) {
     res.status(400).send("Error:" + err.message);
   }
@@ -25,3 +29,4 @@ const userAuth = async (req, res, next) => {
 };
 
 module.exports = { userAuth };
+
