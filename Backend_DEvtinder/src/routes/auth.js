@@ -6,24 +6,19 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 
 authRouter.post("/signup", async (req, res) => {
-  // console.log(req.body);
-
   try {
     validateSignUpdata(req);
 
     //Encrypting the password+
-
     const { firstName, lastName, emailId, password } = req.body;
     const passHash = await bcrypt.hash(password, 10);
-    // res.send(passHash);
-    // console.log(passHash);
 
     // Crete new instance of new user model
     const user = new User({
       firstName,
       lastName,
       emailId,
-      password: passHash,
+      password:passHash,
     });
     await user.save();
     res.send("User added succefully");
@@ -38,20 +33,15 @@ authRouter.post("/login", async (req, res) => {
     const user = await User.findOne({ emailId: emailId });
     if (!user) {
       throw new Error("Invalid credentials ");
-      // res.send("User not found,check your credentials");
     }
     const isPassword = await user.validatePassword(password);
-
     if (isPassword) {
       //create JWT
       const token = await user.getJWT();
-      // console.log(token);
-
       //Add the token to the cookie and send the response
       res.cookie("token", token);
       res.send("Login successful");
-    console.log("Logged In: " + user.firstName);
-
+      console.log("Logged In: " + user.firstName);
     } else {
       console.log("invalid password");
 
@@ -62,14 +52,12 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
-authRouter.post("/logout",async (req, res) => {
-
-    res.cookie("token",null,{
-      expires:new Date(Date.now())
-    });
-    res.send("Logged Out Successfully");
-    console.log("Logged Out");
-    
+authRouter.post("/logout", async (req, res) => {
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
+  });
+  res.send("Logged Out Successfully");
+  console.log("Logged Out");
 });
 
 module.exports = authRouter;
